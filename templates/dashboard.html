@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - BarcCrypt{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3>Welcome to Your Dashboard</h3>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Profile Information</h5>
+                                <p class="card-text">
+                                    <strong>Username:</strong> {{ current_user.username }}<br>
+                                    <strong>Email:</strong> {{ current_user.email }}<br>
+                                    <strong>Member since:</strong> {{ current_user.created_at.strftime('%Y-%m-%d') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Quick Actions</h5>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ url_for('analyze') }}" class="btn btn-primary">Analyze Password</a>
+                                    <a href="{{ url_for('manage') }}" class="btn btn-secondary">Manage Passwords</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Security Tips</h5>
+                                <ul class="list-unstyled">
+                                    <li>✓ Use strong, unique passwords</li>
+                                    <li>✓ Enable two-factor authentication</li>
+                                    <li>✓ Regularly update your passwords</li>
+                                    <li>✓ Never share your credentials</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
