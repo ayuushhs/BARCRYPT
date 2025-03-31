@@ -62,6 +62,34 @@
                     <div class="results-box {{ strength_class }}">
                         <h3>Password Strength: {{ strength_label }}</h3>
                         <p>{{ feedback }}</p>
+                        
+                        <div class="entropy-section">
+                            <h4>Password Entropy: {{ "%.2f"|format(entropy) }} bits</h4>
+                            <p class="entropy-explanation">Entropy is a measure of password unpredictability. Higher is better.</p>
+                        </div>
+                        
+                        <div class="crack-time-section">
+                            <h4>Estimated Time to Crack:</h4>
+                            <div class="crack-time-grid">
+                                <div class="crack-time-item">
+                                    <span class="crack-time-scenario">Online Attack:</span>
+                                    <span class="crack-time-value">{{ crack_times.online }}</span>
+                                </div>
+                                <div class="crack-time-item">
+                                    <span class="crack-time-scenario">Offline (Slow):</span>
+                                    <span class="crack-time-value">{{ crack_times.offline_slow }}</span>
+                                </div>
+                                <div class="crack-time-item">
+                                    <span class="crack-time-scenario">Offline (Fast):</span>
+                                    <span class="crack-time-value">{{ crack_times.offline_fast }}</span>
+                                </div>
+                                <div class="crack-time-item">
+                                    <span class="crack-time-scenario">Quantum Computer:</span>
+                                    <span class="crack-time-value">{{ crack_times.quantum }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
                         {% if suggestions %}
                         <div class="suggestions">
                             <h4>Suggestions to improve:</h4>
@@ -72,6 +100,18 @@
                             </ul>
                         </div>
                         {% endif %}
+                        
+                        <div class="improved-passwords">
+                            <h4>Suggested Stronger Alternatives:</h4>
+                            <div class="password-suggestions">
+                                {% for improved_password in improved_passwords %}
+                                <div class="suggested-password">
+                                    <input type="text" readonly value="{{ improved_password }}" class="password-suggestion-input">
+                                    <button class="copy-btn" onclick="copyPassword(this)">Copy</button>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
                     </div>
                 {% else %}
                     <div class="results-placeholder">
@@ -145,6 +185,23 @@
                 strengthMeterFill.className = 'strength-meter-fill very-strong';
                 strengthText.innerText = 'Very Strong';
             }
+        }
+        
+        function copyPassword(button) {
+            const input = button.previousElementSibling;
+            input.select();
+            document.execCommand('copy');
+            
+            // Show copy feedback
+            const originalText = button.textContent;
+            button.textContent = 'Copied!';
+            button.classList.add('copied');
+            
+            // Reset button after a short delay
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.classList.remove('copied');
+            }, 1500);
         }
     </script>
 </body>
