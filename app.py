@@ -1,74 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import re
+import password_model
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Required for session management and flash messages
 
 def validate_password_strength(password):
     """
-    Validates password strength based on the following criteria:
-    - At least 10 characters long
-    - Contains at least one uppercase letter
-    - Contains at least one lowercase letter
-    - Contains at least one number
-    - Contains at least one special character
-    
-    Returns a dictionary with validation results and feedback
+    Validate password strength using the ML model and basic checks
     """
-    # Initialize criteria checks
-    criteria = {
-        'length': len(password) >= 10,
-        'uppercase': bool(re.search(r'[A-Z]', password)),
-        'lowercase': bool(re.search(r'[a-z]', password)),
-        'numbers': bool(re.search(r'[0-9]', password)),
-        'special': bool(re.search(r'[^A-Za-z0-9]', password))
-    }
+    # Get comprehensive analysis from the ML model
+    analysis = password_model.analyze_password(password)
     
-    # Count how many criteria are met
-    criteria_met = sum(criteria.values())
-    
-    # Determine strength level
-    if criteria_met <= 1:
-        strength = 'very-weak'
-        label = 'Very Weak'
-        feedback = 'This password is extremely vulnerable to attacks.'
-    elif criteria_met == 2:
-        strength = 'weak'
-        label = 'Weak'
-        feedback = 'This password could be easily cracked.'
-    elif criteria_met == 3:
-        strength = 'medium'
-        label = 'Medium'
-        feedback = 'This password provides moderate security but could be improved.'
-    elif criteria_met == 4:
-        strength = 'strong'
-        label = 'Strong'
-        feedback = 'This password is strong, but one more criterion would make it very strong.'
-    else:
-        strength = 'very-strong'
-        label = 'Very Strong'
-        feedback = 'Excellent! This password meets all security criteria.'
-    
-    # Generate suggestions for improvement
-    suggestions = []
-    if not criteria['length']:
-        suggestions.append('Increase length to at least 10 characters.')
-    if not criteria['uppercase']:
-        suggestions.append('Add at least one uppercase letter (A-Z).')
-    if not criteria['lowercase']:
-        suggestions.append('Add at least one lowercase letter (a-z).')
-    if not criteria['numbers']:
-        suggestions.append('Add at least one number (0-9).')
-    if not criteria['special']:
-        suggestions.append('Add at least one special character (e.g., !@#$%^&*).')
-    
-    return {
-        'criteria': criteria,
-        'strength_class': strength,
-        'strength_label': label,
-        'feedback': feedback,
-        'suggestions': suggestions
-    }
+    # Return all analysis information
+    return analysis
 
 @app.route('/')
 def home():
@@ -99,7 +44,7 @@ def analyze():
             flash('Please enter a password to analyze.', 'danger')
             return render_template('analyze.html', password_checked=False)
         
-        # Analyze password strength
+        # Analyze password strength using the ML model
         result = validate_password_strength(password)
         
         return render_template(
@@ -108,7 +53,10 @@ def analyze():
             strength_class=result['strength_class'],
             strength_label=result['strength_label'],
             feedback=result['feedback'],
-            suggestions=result['suggestions']
+            suggestions=result['suggestions'],
+            entropy=result['entropy'],
+            crack_times=result['crack_times'],
+            improved_passwords=result['improved_passwords']
         )
     
     return render_template('analyze.html', password_checked=False)

@@ -424,6 +424,123 @@ header {
     border-left-color: #27ae60;
 }
 
+/* Entropy section styles */
+.entropy-section {
+    margin: 25px 0;
+    padding: 15px;
+    background-color: rgba(35, 42, 76, 0.6);
+    border-radius: 8px;
+}
+
+.entropy-section h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: #f0f1f5;
+}
+
+.entropy-explanation {
+    font-size: 0.9rem;
+    color: #b4b8c7;
+    font-style: italic;
+}
+
+/* Crack time section styles */
+.crack-time-section {
+    margin: 25px 0;
+    padding: 15px;
+    background-color: rgba(35, 42, 76, 0.6);
+    border-radius: 8px;
+}
+
+.crack-time-section h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #f0f1f5;
+}
+
+.crack-time-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.crack-time-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.crack-time-scenario {
+    font-size: 0.9rem;
+    color: #b4b8c7;
+}
+
+.crack-time-value {
+    font-size: 1rem;
+    color: #f0f1f5;
+    font-weight: 500;
+}
+
+/* Improved passwords section */
+.improved-passwords {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: rgba(35, 42, 76, 0.6);
+    border-radius: 8px;
+}
+
+.improved-passwords h4 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #f0f1f5;
+}
+
+.password-suggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.suggested-password {
+    display: flex;
+    gap: 10px;
+}
+
+.password-suggestion-input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 6px;
+    border: 1px solid #2a325a;
+    background-color: rgba(35, 42, 76, 0.5);
+    color: #f0f1f5;
+    font-family: 'Courier New', monospace;
+    font-size: 1rem;
+}
+
+.copy-btn {
+    padding: 0 15px;
+    border: none;
+    border-radius: 6px;
+    background-color: #3696FC;
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background-color: #2580e0;
+}
+
+.copy-btn.copied {
+    background-color: #27ae60;
+}
+
 .suggestions {
     margin-top: 20px;
     padding-top: 15px;
@@ -507,6 +624,10 @@ header {
     .content-box, .login-container {
         padding: 30px;
     }
+    
+    .crack-time-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {
@@ -536,5 +657,14 @@ header {
     
     .criteria-item {
         font-size: 0.85rem;
+    }
+    
+    .password-suggestion-input {
+        font-size: 0.9rem;
+    }
+    
+    .copy-btn {
+        font-size: 0.8rem;
+        padding: 0 10px;
     }
 } 
