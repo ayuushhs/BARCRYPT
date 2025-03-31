@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - BARCRYPT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Poppins Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="{{ url_for('home') }}" class="home-link">
+                <h1 class="main-heading small">BARCRYPT</h1>
+            </a>
+            <p class="tagline small">Secure Every Login, Protect Every Step.</p>
+        </header>
+        
+        <div class="login-container">
+            <h2>Create Account</h2>
+            <form class="login-form" method="POST" action="#">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Choose a username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Choose a password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm_password">Confirm Password</label>
+                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm your password" required>
+                </div>
+                <button type="submit" class="login-btn">Create Account</button>
+            </form>
+            <p class="create-account">Already have an account? <a href="{{ url_for('login') }}">Login!</a></p>
+        </div>
+        
+        <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+    </div>
+</body>
+</html> 

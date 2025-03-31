@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BARCRYPT - Password Security</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Poppins Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <header>
+            <h1 class="main-heading">BARCRYPT</h1>
+            <p class="tagline">Secure Every Login, Protect Every Step.</p>
+        </header>
+        
+        <div class="button-container">
+            <a href="{{ url_for('analyze') }}" class="action-btn analyze-btn">Analyze Password</a>
+            <a href="{{ url_for('manage') }}" class="action-btn manage-btn">Manage Passwords</a>
+        </div>
+        
+        <a href="{{ url_for('login') }}" class="login-link">Signup/Login to access more features.</a>
+    </div>
+</body>
+</html> 

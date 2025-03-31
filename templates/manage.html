@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Passwords - BARCRYPT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Poppins Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="{{ url_for('home') }}" class="home-link">
+                <h1 class="main-heading small">BARCRYPT</h1>
+            </a>
+            <p class="tagline small">Secure Every Login, Protect Every Step.</p>
+        </header>
+        
+        <div class="content-box">
+            <h2>Manage Your Passwords</h2>
+            <p class="description">Securely store and manage all your passwords in one place.</p>
+            
+            <div class="password-list">
+                <div class="empty-state">
+                    <p>You haven't saved any passwords yet.</p>
+                    <button class="add-password-btn">Add Your First Password</button>
+                </div>
+                
+                <!-- Password entries would be listed here when available -->
+            </div>
+        </div>
+        
+        <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+    </div>
+</body>
+</html> 

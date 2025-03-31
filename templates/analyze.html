@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Password - BARCRYPT</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Poppins Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="{{ url_for('home') }}" class="home-link">
+                <h1 class="main-heading small">BARCRYPT</h1>
+            </a>
+            <p class="tagline small">Secure Every Login, Protect Every Step.</p>
+        </header>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <div class="content-box">
+            <h2>Analyze Your Password</h2>
+            <p class="description">Our AI-powered tool will check your password strength and provide security recommendations.</p>
+            
+            <form class="password-form" id="passwordForm" method="POST" action="{{ url_for('analyze') }}">
+                <div class="form-group">
+                    <label for="password">Enter Password to Analyze</label>
+                    <input type="password" id="password" name="password" placeholder="Type your password here" oninput="checkPasswordStrength()">
+                </div>
+                
+                <div class="strength-meter-container">
+                    <div class="strength-meter">
+                        <div class="strength-meter-fill" id="strengthMeterFill"></div>
+                    </div>
+                    <p class="strength-text" id="strengthText">Password strength</p>
+                </div>
+                
+                <div class="criteria-list" id="criteriaList">
+                    <p class="criteria-item" id="lengthCriteria">✗ At least 10 characters</p>
+                    <p class="criteria-item" id="upperCriteria">✗ At least one uppercase letter</p>
+                    <p class="criteria-item" id="lowerCriteria">✗ At least one lowercase letter</p>
+                    <p class="criteria-item" id="numberCriteria">✗ At least one number</p>
+                    <p class="criteria-item" id="specialCriteria">✗ At least one special character</p>
+                </div>
+                
+                <div class="button-center">
+                    <button type="submit" class="analyze-submit-btn">Check Strength</button>
+                </div>
+            </form>
+            
+            <div class="results-container" id="resultsContainer">
+                {% if password_checked %}
+                    <div class="results-box {{ strength_class }}">
+                        <h3>Password Strength: {{ strength_label }}</h3>
+                        <p>{{ feedback }}</p>
+                        {% if suggestions %}
+                        <div class="suggestions">
+                            <h4>Suggestions to improve:</h4>
+                            <ul>
+                                {% for suggestion in suggestions %}
+                                <li>{{ suggestion }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="results-placeholder">
+                        <p>Password strength results will appear here</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+    </div>
+
+    <script>
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthMeterFill = document.getElementById('strengthMeterFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            // Check individual criteria
+            const lengthValid = password.length >= 10;
+            const upperValid = /[A-Z]/.test(password);
+            const lowerValid = /[a-z]/.test(password);
+            const numberValid = /[0-9]/.test(password);
+            const specialValid = /[^A-Za-z0-9]/.test(password);
+            
+            // Update criteria indicators
+            document.getElementById('lengthCriteria').innerHTML = 
+                (lengthValid ? "✓" : "✗") + " At least 10 characters";
+            document.getElementById('upperCriteria').innerHTML = 
+                (upperValid ? "✓" : "✗") + " At least one uppercase letter";
+            document.getElementById('lowerCriteria').innerHTML = 
+                (lowerValid ? "✓" : "✗") + " At least one lowercase letter";
+            document.getElementById('numberCriteria').innerHTML = 
+                (numberValid ? "✓" : "✗") + " At least one number";
+            document.getElementById('specialCriteria').innerHTML = 
+                (specialValid ? "✓" : "✗") + " At least one special character";
+            
+            // Update criteria class based on validation
+            document.getElementById('lengthCriteria').className = 
+                'criteria-item ' + (lengthValid ? 'valid' : 'invalid');
+            document.getElementById('upperCriteria').className = 
+                'criteria-item ' + (upperValid ? 'valid' : 'invalid');
+            document.getElementById('lowerCriteria').className = 
+                'criteria-item ' + (lowerValid ? 'valid' : 'invalid');
+            document.getElementById('numberCriteria').className = 
+                'criteria-item ' + (numberValid ? 'valid' : 'invalid');
+            document.getElementById('specialCriteria').className = 
+                'criteria-item ' + (specialValid ? 'valid' : 'invalid');
+                
+            // Calculate strength percentage
+            let validCount = [lengthValid, upperValid, lowerValid, numberValid, specialValid].filter(Boolean).length;
+            let strengthPercentage = (validCount / 5) * 100;
+            
+            // Update strength meter
+            strengthMeterFill.style.width = strengthPercentage + '%';
+            
+            // Set color and text based on strength
+            if (strengthPercentage <= 20) {
+                strengthMeterFill.className = 'strength-meter-fill very-weak';
+                strengthText.innerText = 'Very Weak';
+            } else if (strengthPercentage <= 40) {
+                strengthMeterFill.className = 'strength-meter-fill weak';
+                strengthText.innerText = 'Weak';
+            } else if (strengthPercentage <= 60) {
+                strengthMeterFill.className = 'strength-meter-fill medium';
+                strengthText.innerText = 'Medium';
+            } else if (strengthPercentage <= 80) {
+                strengthMeterFill.className = 'strength-meter-fill strong';
+                strengthText.innerText = 'Strong';
+            } else {
+                strengthMeterFill.className = 'strength-meter-fill very-strong';
+                strengthText.innerText = 'Very Strong';
+            }
+        }
+    </script>
+</body>
+</html> 
