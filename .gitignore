@@ -1,13 +1,10 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
 *.so
-
-# Distribution / packaging
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -19,30 +16,25 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 
-# Flask stuff:
-instance/
-.webassets-cache
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# IDE specific files
+# IDE
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# OS specific files
+# Project specific
+data/rockyou.txt
+password-model/
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# OS specific
 .DS_Store
 Thumbs.db 
