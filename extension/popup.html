@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarcCrypt Password Manager</title>
+    <style>
+        body {
+            width: 300px;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .header img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            background-color: #f5f5f5;
+        }
+        .status p {
+            margin: 0;
+            color: #666;
+        }
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            width: 100%;
+        }
+        .manage-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .manage-btn:hover {
+            background-color: #1976D2;
+        }
+        .analyze-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .analyze-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="icons/icon48.png" alt="BarcCrypt">
+        <h1>BarcCrypt</h1>
+    </div>
+    <div class="status">
+        <p>Ready to help you manage passwords securely</p>
+    </div>
+    <div class="actions">
+        <button class="manage-btn" id="manageBtn">Manage Passwords</button>
+        <button class="analyze-btn" id="analyzeBtn">Analyze Password</button>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html> 

@@ -3,48 +3,133 @@
 {% block title %}Dashboard - BarcCrypt{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h3>Welcome to Your Dashboard</h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Profile Information</h5>
-                                <p class="card-text">
-                                    <strong>Username:</strong> {{ current_user.username }}<br>
-                                    <strong>Email:</strong> {{ current_user.email }}<br>
-                                    <strong>Member since:</strong> {{ current_user.created_at.strftime('%Y-%m-%d') }}
-                                </p>
-                            </div>
+<div class="container mt-4">
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="mb-0">Welcome to Your Dashboard</h3>
+        </div>
+        <div class="card-body">
+            <!-- Top Row: Profile, Stats, Actions -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Profile Information</h5>
+                            <p class="card-text">
+                                <strong>Username:</strong> {{ current_user.username }}<br>
+                                <strong>Email:</strong> {{ current_user.email }}<br>
+                                <strong>Member since:</strong> {{ current_user.created_at.strftime('%Y-%m-%d') }}
+                            </p>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Quick Actions</h5>
-                                <div class="d-grid gap-2">
-                                    <a href="{{ url_for('analyze') }}" class="btn btn-primary">Analyze Password</a>
-                                    <a href="{{ url_for('manage') }}" class="btn btn-secondary">Manage Passwords</a>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Password Statistics</h5>
+                            <div class="stats-container">
+                                <div class="stat-item">
+                                    <i class="bi bi-key-fill text-primary"></i>
+                                    <div class="stat-details">
+                                        <span class="stat-value">{{ stats.total_passwords }}</span>
+                                        <span class="stat-label">Total Passwords</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item {% if stats.breached_sites > 0 %}text-danger{% endif %}">
+                                    <i class="bi bi-shield-exclamation"></i>
+                                    <div class="stat-details">
+                                        <span class="stat-value">{{ stats.breached_sites }}</span>
+                                        <span class="stat-label">Breached Sites</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item {% if stats.passwords_need_update > 0 %}text-warning{% endif %}">
+                                    <i class="bi bi-clock-history"></i>
+                                    <div class="stat-details">
+                                        <span class="stat-value">{{ stats.passwords_need_update }}</span>
+                                        <span class="stat-label">Need Update</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">Security Tips</h5>
-                                <ul class="list-unstyled">
-                                    <li>✓ Use strong, unique passwords</li>
-                                    <li>✓ Enable two-factor authentication</li>
-                                    <li>✓ Regularly update your passwords</li>
-                                    <li>✓ Never share your credentials</li>
-                                </ul>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Quick Actions</h5>
+                            <div class="d-grid gap-2">
+                                <a href="{{ url_for('analyze') }}" class="btn btn-primary">Analyze Password</a>
+                                <a href="{{ url_for('manage') }}" class="btn btn-secondary">Manage Passwords</a>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Row: Security Graph and Tips -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-8">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Security Improvement</h5>
+                            <div class="text-muted small mb-3">
+                                Total Improvement: {{ "%.1f"|format(stats.security_improvement.total_improvement) }} points
+                                | Current Score: {{ "%.1f"|format(stats.security_improvement.average_strength) }}
+                            </div>
+                            <div style="height: 250px;">
+                                <canvas id="securityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Security Tips</h5>
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-2">✓ Use strong, unique passwords</li>
+                                <li class="mb-2">✓ Enable two-factor authentication</li>
+                                <li class="mb-2">✓ Regularly update your passwords</li>
+                                <li class="mb-2">✓ Never share your credentials</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Recent Breaches -->
+            <div class="row g-3">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-3">Recent Data Breaches</h5>
+                            {% if stats.recent_breaches %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Website</th>
+                                            <th>Breach Date</th>
+                                            <th>Affected Accounts</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for breach in stats.recent_breaches %}
+                                        <tr>
+                                            <td>{{ breach.website }}</td>
+                                            <td>{{ breach.breach_date }}</td>
+                                            <td>{{ breach.pwn_count|string|replace(',', '') if breach.pwn_count != 'Unknown' else breach.pwn_count }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-success mb-0">
+                                <i class="bi bi-shield-check"></i>
+                                No recent breaches detected for your stored websites.
+                            </p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -52,4 +137,131 @@
         </div>
     </div>
 </div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById('securityChart').getContext('2d');
+    var securityChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: {{ stats.security_improvement.labels | tojson }},
+            datasets: [{
+                label: 'Average Password Strength',
+                data: {{ stats.security_improvement.data | tojson }},
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Password Strength Score'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Month'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: false
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.stats-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.03);
+    transition: background-color 0.2s ease;
+}
+
+.stat-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.stat-item i {
+    font-size: 1.25rem;
+    margin-right: 1rem;
+    width: 1.5rem;
+    text-align: center;
+}
+
+.stat-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.text-danger i {
+    color: #dc3545;
+}
+
+.text-warning i {
+    color: #ffc107;
+}
+
+.text-success i {
+    color: #198754;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: rgba(0, 0, 0, 0.02);
+}
+</style>
 {% endblock %} 

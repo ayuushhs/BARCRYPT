@@ -1,208 +1,219 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analyze Password - BARCRYPT</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Poppins Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-<body>
-    <div class="container">
-        <header>
-            <a href="{{ url_for('home') }}" class="home-link">
-                <h1 class="main-heading small">BARCRYPT</h1>
-            </a>
-            <p class="tagline small">Secure Every Login, Protect Every Step.</p>
-        </header>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <div class="flash-messages">
-                    {% for category, message in messages %}
-                        <div class="alert alert-{{ category }}">{{ message }}</div>
-                    {% endfor %}
+{% extends "base.html" %}
+
+{% block title %}Analyze Password - BarcCrypt{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="mb-0">Password Strength Analyzer</h3>
                 </div>
-            {% endif %}
-        {% endwith %}
-        
-        <div class="content-box">
-            <h2>Analyze Your Password</h2>
-            <p class="description">Our AI-powered tool will check your password strength and provide security recommendations.</p>
-            
-            <form class="password-form" id="passwordForm" method="POST" action="{{ url_for('analyze') }}">
+                <div class="card-body">
+                    <form method="POST" class="mb-4">
                 <div class="form-group">
-                    <label for="password">Enter Password to Analyze</label>
-                    <input type="password" id="password" name="password" placeholder="Type your password here" oninput="checkPasswordStrength()">
+                            <label for="password">Enter Password to Analyze:</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()" title="Toggle password visibility" aria-label="Toggle password visibility">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </button>
                 </div>
-                
-                <div class="strength-meter-container">
-                    <div class="strength-meter">
-                        <div class="strength-meter-fill" id="strengthMeterFill"></div>
-                    </div>
-                    <p class="strength-text" id="strengthText">Password strength</p>
-                </div>
-                
-                <div class="criteria-list" id="criteriaList">
-                    <p class="criteria-item" id="lengthCriteria">✗ At least 10 characters</p>
-                    <p class="criteria-item" id="upperCriteria">✗ At least one uppercase letter</p>
-                    <p class="criteria-item" id="lowerCriteria">✗ At least one lowercase letter</p>
-                    <p class="criteria-item" id="numberCriteria">✗ At least one number</p>
-                    <p class="criteria-item" id="specialCriteria">✗ At least one special character</p>
-                </div>
-                
-                <div class="button-center">
-                    <button type="submit" class="analyze-submit-btn">Check Strength</button>
-                </div>
-            </form>
-            
-            <div class="results-container" id="resultsContainer">
-                {% if password_checked %}
-                    <div class="results-box {{ strength_class }}">
-                        <h3>Password Strength: {{ strength_label }}</h3>
-                        <p>{{ feedback }}</p>
-                        
-                        <div class="entropy-section">
-                            <h4>Password Entropy: {{ "%.2f"|format(entropy) }} bits</h4>
-                            <p class="entropy-explanation">Entropy is a measure of password unpredictability. Higher is better.</p>
                         </div>
-                        
-                        <div class="crack-time-section">
-                            <h4>Estimated Time to Crack:</h4>
-                            <div class="crack-time-grid">
-                                <div class="crack-time-item">
-                                    <span class="crack-time-scenario">Online Attack:</span>
-                                    <span class="crack-time-value">{{ crack_times.online }}</span>
+                        <button type="submit" class="btn btn-primary mt-3">Analyze Password</button>
+                    </form>
+
+                    {% if analysis %}
+                    <div class="analysis-results">
+                        <!-- Password Strength Overview -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Password Strength Overview</h5>
+                                <div class="strength-meter mb-3">
+                                    <div class="progress">
+                                        <div class="progress-bar {{ analysis.strength_class }}" role="progressbar" 
+                                             style="width: {{ analysis.strength_score }}%">
+                                            {{ analysis.strength_score }}%
+                                        </div>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <span class="badge {{ analysis.strength_class }}">{{ analysis.strength_label }}</span>
                                 </div>
-                                <div class="crack-time-item">
-                                    <span class="crack-time-scenario">Offline (Slow):</span>
-                                    <span class="crack-time-value">{{ crack_times.offline_slow }}</span>
                                 </div>
-                                <div class="crack-time-item">
-                                    <span class="crack-time-scenario">Offline (Fast):</span>
-                                    <span class="crack-time-value">{{ crack_times.offline_fast }}</span>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Entropy Score:</strong> {{ analysis.entropy }}</p>
+                                        <p><strong>Time to Crack:</strong> {{ analysis.crack_time }}</p>
+                                        <p><strong>Password Category:</strong> {{ analysis.password_category }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Potential Attack Vectors:</strong></p>
+                                        <ul>
+                                            {% for vector in analysis.attack_vectors %}
+                                            <li>{{ vector }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
                                 </div>
-                                <div class="crack-time-item">
-                                    <span class="crack-time-scenario">Quantum Computer:</span>
-                                    <span class="crack-time-value">{{ crack_times.quantum }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Password Composition -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title">Password Composition</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="list-group">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Length
+                                                <span class="badge {{ 'bg-success' if analysis.metrics.length >= 12 else 'bg-warning' if analysis.metrics.length >= 8 else 'bg-danger' }}">
+                                                    {{ analysis.metrics.length }} characters
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Uppercase Letters
+                                                <span class="badge {{ 'bg-success' if analysis.metrics.has_uppercase else 'bg-danger' }}">
+                                                    {{ 'Yes' if analysis.metrics.has_uppercase else 'No' }}
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Lowercase Letters
+                                                <span class="badge {{ 'bg-success' if analysis.metrics.has_lowercase else 'bg-danger' }}">
+                                                    {{ 'Yes' if analysis.metrics.has_lowercase else 'No' }}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="list-group">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Numbers
+                                                <span class="badge {{ 'bg-success' if analysis.metrics.has_numbers else 'bg-danger' }}">
+                                                    {{ 'Yes' if analysis.metrics.has_numbers else 'No' }}
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Special Characters
+                                                <span class="badge {{ 'bg-success' if analysis.metrics.has_special else 'bg-danger' }}">
+                                                    {{ 'Yes' if analysis.metrics.has_special else 'No' }}
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                Common Password
+                                                <span class="badge {{ 'bg-danger' if analysis.metrics.is_common else 'bg-success' }}">
+                                                    {{ 'Yes' if analysis.metrics.is_common else 'No' }}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         
-                        {% if suggestions %}
-                        <div class="suggestions">
-                            <h4>Suggestions to improve:</h4>
-                            <ul>
-                                {% for suggestion in suggestions %}
-                                <li>{{ suggestion }}</li>
+                        <!-- Weaknesses -->
+                        {% if analysis.weaknesses %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title text-danger">Identified Weaknesses</h5>
+                                <ul class="list-unstyled">
+                                    {% for weakness in analysis.weaknesses %}
+                                    <li>
+                                        <i class="bi bi-exclamation-triangle text-danger"></i>
+                                        {{ weakness }}
+                                    </li>
                                 {% endfor %}
                             </ul>
+                            </div>
                         </div>
                         {% endif %}
                         
-                        <div class="improved-passwords">
-                            <h4>Suggested Stronger Alternatives:</h4>
-                            <div class="password-suggestions">
-                                {% for improved_password in improved_passwords %}
-                                <div class="suggested-password">
-                                    <input type="text" readonly value="{{ improved_password }}" class="password-suggestion-input">
-                                    <button class="copy-btn" onclick="copyPassword(this)">Copy</button>
-                                </div>
+                        <!-- AI Suggestions -->
+                        {% if analysis.suggestions %}
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">AI-Powered Suggestions</h5>
+                                <ul class="list-unstyled">
+                                    {% for suggestion in analysis.suggestions %}
+                                    <li>
+                                        <i class="bi bi-lightbulb text-primary"></i>
+                                        {{ suggestion }}
+                                    </li>
                                 {% endfor %}
+                                </ul>
                             </div>
                         </div>
-                    </div>
-                {% else %}
-                    <div class="results-placeholder">
-                        <p>Password strength results will appear here</p>
+                        {% endif %}
                     </div>
                 {% endif %}
+                </div>
             </div>
         </div>
-        
-        <a href="{{ url_for('home') }}" class="back-link">← Back to Home</a>
+    </div>
     </div>
 
     <script>
-        function checkPasswordStrength() {
-            const password = document.getElementById('password').value;
-            const strengthMeterFill = document.getElementById('strengthMeterFill');
-            const strengthText = document.getElementById('strengthText');
-            
-            // Check individual criteria
-            const lengthValid = password.length >= 10;
-            const upperValid = /[A-Z]/.test(password);
-            const lowerValid = /[a-z]/.test(password);
-            const numberValid = /[0-9]/.test(password);
-            const specialValid = /[^A-Za-z0-9]/.test(password);
-            
-            // Update criteria indicators
-            document.getElementById('lengthCriteria').innerHTML = 
-                (lengthValid ? "✓" : "✗") + " At least 10 characters";
-            document.getElementById('upperCriteria').innerHTML = 
-                (upperValid ? "✓" : "✗") + " At least one uppercase letter";
-            document.getElementById('lowerCriteria').innerHTML = 
-                (lowerValid ? "✓" : "✗") + " At least one lowercase letter";
-            document.getElementById('numberCriteria').innerHTML = 
-                (numberValid ? "✓" : "✗") + " At least one number";
-            document.getElementById('specialCriteria').innerHTML = 
-                (specialValid ? "✓" : "✗") + " At least one special character";
-            
-            // Update criteria class based on validation
-            document.getElementById('lengthCriteria').className = 
-                'criteria-item ' + (lengthValid ? 'valid' : 'invalid');
-            document.getElementById('upperCriteria').className = 
-                'criteria-item ' + (upperValid ? 'valid' : 'invalid');
-            document.getElementById('lowerCriteria').className = 
-                'criteria-item ' + (lowerValid ? 'valid' : 'invalid');
-            document.getElementById('numberCriteria').className = 
-                'criteria-item ' + (numberValid ? 'valid' : 'invalid');
-            document.getElementById('specialCriteria').className = 
-                'criteria-item ' + (specialValid ? 'valid' : 'invalid');
-                
-            // Calculate strength percentage
-            let validCount = [lengthValid, upperValid, lowerValid, numberValid, specialValid].filter(Boolean).length;
-            let strengthPercentage = (validCount / 5) * 100;
-            
-            // Update strength meter
-            strengthMeterFill.style.width = strengthPercentage + '%';
-            
-            // Set color and text based on strength
-            if (strengthPercentage <= 20) {
-                strengthMeterFill.className = 'strength-meter-fill very-weak';
-                strengthText.innerText = 'Very Weak';
-            } else if (strengthPercentage <= 40) {
-                strengthMeterFill.className = 'strength-meter-fill weak';
-                strengthText.innerText = 'Weak';
-            } else if (strengthPercentage <= 60) {
-                strengthMeterFill.className = 'strength-meter-fill medium';
-                strengthText.innerText = 'Medium';
-            } else if (strengthPercentage <= 80) {
-                strengthMeterFill.className = 'strength-meter-fill strong';
-                strengthText.innerText = 'Strong';
-            } else {
-                strengthMeterFill.className = 'strength-meter-fill very-strong';
-                strengthText.innerText = 'Very Strong';
-            }
-        }
-        
-        function copyPassword(button) {
-            const input = button.previousElementSibling;
-            input.select();
-            document.execCommand('copy');
-            
-            // Show copy feedback
-            const originalText = button.textContent;
-            button.textContent = 'Copied!';
-            button.classList.add('copied');
-            
-            // Reset button after a short delay
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.classList.remove('copied');
-            }, 1500);
-        }
-    </script>
-</body>
-</html> 
+function togglePassword() {
+    var x = document.getElementById("password");
+    if (x.type === "password") {
+        x.type = "text";
+    } else {
+        x.type = "password";
+    }
+}
+</script>
+
+{% block styles %}
+<style>
+.analysis-results {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.list-unstyled li {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 0.25rem;
+}
+
+.list-unstyled li i {
+    margin-right: 0.5rem;
+}
+
+.input-group .btn {
+    z-index: 0;
+}
+
+.strength-meter .progress {
+    height: 25px;
+    border-radius: 12px;
+    background-color: #e9ecef;
+}
+
+.strength-meter .progress-bar {
+    line-height: 25px;
+    font-weight: bold;
+    transition: width 0.6s ease;
+}
+
+.badge {
+    font-size: 0.9em;
+    padding: 0.5em 0.8em;
+}
+
+.bg-very-weak { background-color: #dc3545; }
+.bg-weak { background-color: #fd7e14; }
+.bg-medium { background-color: #ffc107; }
+.bg-strong { background-color: #20c997; }
+.bg-very-strong { background-color: #198754; }
+</style>
+{% endblock %}
+
+{% endblock %} 

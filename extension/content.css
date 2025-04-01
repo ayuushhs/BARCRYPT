@@ -1,0 +1,222 @@
+.barcrypt-popup {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    transform: none;
+    z-index: 999999;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #333;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.barcrypt-popup-content {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    padding: 24px;
+    width: 360px;
+    position: relative;
+}
+
+.close-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #666;
+    line-height: 0;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.close-button:hover {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.close-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+.barcrypt-popup-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.barcrypt-popup-header img {
+    width: 32px;
+    height: 32px;
+}
+
+.barcrypt-popup-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.password-section {
+    margin-bottom: 20px;
+}
+
+.password-label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.password-preview {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.password-preview input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 14px;
+    background: #f8f8f8;
+    color: #333;
+}
+
+.copy-btn {
+    background: none;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #666;
+    line-height: 0;
+    transition: all 0.2s;
+}
+
+.copy-btn:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+    color: #333;
+}
+
+.password-strength {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+.strength-indicator {
+    flex: 1;
+    height: 4px;
+    background: #eee;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.strength-indicator div {
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+.strength-weak div {
+    width: 33%;
+    background: #ff4d4d;
+}
+
+.strength-medium div {
+    width: 66%;
+    background: #ffb84d;
+}
+
+.strength-strong div {
+    width: 100%;
+    background: #47d147;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.actions button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.generate-btn {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+.generate-btn:hover {
+    background: #eee;
+    border-color: #ccc;
+}
+
+.save-btn {
+    background: #2563eb;
+    border: 1px solid #2563eb;
+    color: white;
+    flex: 1;
+}
+
+.save-btn:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.success-message,
+.error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    border-radius: 6px;
+    margin-top: 16px;
+}
+
+.success-message {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.error-message {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.success-message svg,
+.error-message svg {
+    flex-shrink: 0;
+} 

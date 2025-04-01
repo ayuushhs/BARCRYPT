@@ -1,0 +1,294 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - BarcCrypt{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0">Profile Settings</h3>
+            </div>
+            <div class="card-body">
+                <!-- Profile Information -->
+                <div class="mb-4">
+                    <h4 class="mb-3">Profile Information</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Username</label>
+                            <p class="form-control-static">{{ current_user.username }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <p class="form-control-static">{{ current_user.email }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change Password Form -->
+                <div class="mb-4">
+                    <h4 class="mb-3">Change Password</h4>
+                    <form id="changePasswordForm" method="POST" action="{{ url_for('change_password') }}">
+                        <div class="mb-3">
+                            <label for="current_password" class="form-label">Current Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="toggleCurrentPassword">
+                                    <i class="bi bi-eye"></i><span> Show</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="new_password" name="new_password" required
+                                       oninput="checkPasswordStrength(this.value)">
+                                <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword">
+                                    <i class="bi bi-eye"></i><span> Show</span>
+                                </button>
+                            </div>
+                            <!-- Add strength meter -->
+                            <div class="password-strength-meter mt-2">
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar" id="strength-meter" role="progressbar" 
+                                         style="width: 0%; transition: width 0.3s ease-in-out;" 
+                                         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                                <div class="d-flex justify-content-between mt-1">
+                                    <small class="text-muted" id="strength-text">Password strength</small>
+                                    <small class="text-muted" id="criteria-met">0/5 criteria met</small>
+                                </div>
+                            </div>
+                            <!-- Password criteria checklist -->
+                            <div class="password-criteria mt-2">
+                                <small class="d-block mb-1" id="length-check">
+                                    <i class="bi bi-x-circle text-danger"></i> At least 10 characters
+                                </small>
+                                <small class="d-block mb-1" id="uppercase-check">
+                                    <i class="bi bi-x-circle text-danger"></i> Contains uppercase letter
+                                </small>
+                                <small class="d-block mb-1" id="lowercase-check">
+                                    <i class="bi bi-x-circle text-danger"></i> Contains lowercase letter
+                                </small>
+                                <small class="d-block mb-1" id="number-check">
+                                    <i class="bi bi-x-circle text-danger"></i> Contains number
+                                </small>
+                                <small class="d-block mb-1" id="special-check">
+                                    <i class="bi bi-x-circle text-danger"></i> Contains special character
+                                </small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+                                <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                    <i class="bi bi-eye"></i><span> Show</span>
+                                </button>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+                </div>
+
+                <!-- Account Statistics -->
+                <div class="mb-4">
+                    <h4 class="mb-3">Account Statistics</h4>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ current_user.passwords|length }}</h5>
+                                    <p class="card-text text-muted">Stored Passwords</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ current_user.created_at.strftime('%Y-%m-%d') }}</h5>
+                                    <p class="card-text text-muted">Member Since</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ current_user.last_login.strftime('%Y-%m-%d') if current_user.last_login else 'Never' }}</h5>
+                                    <p class="card-text text-muted">Last Login</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Password visibility toggles
+    function setupPasswordToggle(inputId, buttonId) {
+        const input = document.getElementById(inputId);
+        const button = document.getElementById(buttonId);
+        if (input && button) {
+            button.addEventListener('click', function() {
+                const type = input.type === 'password' ? 'text' : 'password';
+                input.type = type;
+                const icon = button.querySelector('i');
+                const text = button.querySelector('span');
+                if (type === 'password') {
+                    icon.className = 'bi bi-eye';
+                    text.textContent = ' Show';
+                } else {
+                    icon.className = 'bi bi-eye-slash';
+                    text.textContent = ' Hide';
+                }
+            });
+        }
+    }
+
+    setupPasswordToggle('current_password', 'toggleCurrentPassword');
+    setupPasswordToggle('new_password', 'toggleNewPassword');
+    setupPasswordToggle('confirm_password', 'toggleConfirmPassword');
+
+    // Password strength checker
+    window.checkPasswordStrength = function(password) {
+        const criteria = {
+            length: password.length >= 10,
+            uppercase: /[A-Z]/.test(password),
+            lowercase: /[a-z]/.test(password),
+            number: /[0-9]/.test(password),
+            special: /[^A-Za-z0-9]/.test(password)
+        };
+
+        updateCriteriaDisplay('length-check', criteria.length, 'At least 10 characters');
+        updateCriteriaDisplay('uppercase-check', criteria.uppercase, 'Contains uppercase letter');
+        updateCriteriaDisplay('lowercase-check', criteria.lowercase, 'Contains lowercase letter');
+        updateCriteriaDisplay('number-check', criteria.number, 'Contains number');
+        updateCriteriaDisplay('special-check', criteria.special, 'Contains special character');
+
+        const criteriaCount = Object.values(criteria).filter(Boolean).length;
+        const strengthPercentage = (criteriaCount / 5) * 100;
+
+        const strengthMeter = document.getElementById('strength-meter');
+        strengthMeter.style.width = strengthPercentage + '%';
+        strengthMeter.className = 'progress-bar ' + getStrengthClass(strengthPercentage);
+
+        const strengthText = document.getElementById('strength-text');
+        strengthText.textContent = getStrengthLabel(strengthPercentage);
+        strengthText.className = 'text-' + getStrengthTextClass(strengthPercentage);
+
+        document.getElementById('criteria-met').textContent = `${criteriaCount}/5 criteria met`;
+    }
+
+    function updateCriteriaDisplay(elementId, isValid, text) {
+        const element = document.getElementById(elementId);
+        if (isValid) {
+            element.innerHTML = `<i class="bi bi-check-circle text-success"></i> ${text}`;
+        } else {
+            element.innerHTML = `<i class="bi bi-x-circle text-danger"></i> ${text}`;
+        }
+    }
+
+    function getStrengthClass(percentage) {
+        if (percentage <= 20) return 'bg-danger';
+        if (percentage <= 40) return 'bg-warning';
+        if (percentage <= 60) return 'bg-info';
+        if (percentage <= 80) return 'bg-primary';
+        return 'bg-success';
+    }
+
+    function getStrengthTextClass(percentage) {
+        if (percentage <= 20) return 'danger';
+        if (percentage <= 40) return 'warning';
+        if (percentage <= 60) return 'info';
+        if (percentage <= 80) return 'primary';
+        return 'success';
+    }
+
+    function getStrengthLabel(percentage) {
+        if (percentage <= 20) return 'Very Weak';
+        if (percentage <= 40) return 'Weak';
+        if (percentage <= 60) return 'Medium';
+        if (percentage <= 80) return 'Strong';
+        return 'Very Strong';
+    }
+
+    // Form submission
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    if (changePasswordForm) {
+        changePasswordForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('new_password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match!');
+                return;
+            }
+            
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Password changed successfully!');
+                    this.reset();
+                } else {
+                    alert(data.message || 'Error changing password');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error changing password');
+            });
+        });
+    }
+});
+</script>
+
+<style>
+.password-strength-meter .progress {
+    border-radius: 4px;
+    background-color: #e9ecef;
+}
+
+.password-strength-meter .progress-bar {
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.password-criteria small {
+    transition: color 0.3s ease-in-out;
+}
+
+.password-criteria i {
+    margin-right: 5px;
+}
+
+.password-criteria small i {
+    transition: transform 0.2s ease-in-out;
+}
+
+.password-criteria small i.bi-check-circle {
+    transform: scale(1.1);
+}
+
+.form-control-static {
+    padding: 0.375rem 0.75rem;
+    margin-bottom: 0;
+    color: #212529;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+</style>
+{% endblock %} 

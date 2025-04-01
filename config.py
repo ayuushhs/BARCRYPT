@@ -3,7 +3,7 @@ from datetime import timedelta
 
 class Config:
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = 'mysql://barcrypt_user:Barcrypt123!@localhost/barcrypt'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://barcrypt_user:Barcrypt123!@localhost/barcrypt'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # Security configuration
